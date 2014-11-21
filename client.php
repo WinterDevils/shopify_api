@@ -1,6 +1,7 @@
 <?php
 
 	namespace sandeepshetty\shopify_api;
+	//require 'vendor/autoload.php';
 
 
 	function install_url($shop, $api_key)
@@ -66,15 +67,24 @@
 			}
 			catch(WcurlException $e)
 			{
-				throw new CurlException($e->getMessage(), $e->getCode());
+				//throw new CurlException($e->getMessage(), $e->getCode());
+				$info['error'] = true;
+				//$info['headers'] = $response_headers;
+				return $info;
 			}
 
 			$response = json_decode($response, true);
 
-			if (isset($response['errors']) or ($response_headers['http_status_code'] >= 400))
-					throw new ApiException(compact('method', 'path', 'params', 'response_headers', 'response', 'shops_myshopify_domain', 'shops_token'));
-
-			return (is_array($response) and !empty($response)) ? array_shift($response) : $response;
+			if (isset($response['errors']) or ($response_headers['http_status_code'] >= 400)){
+					//throw new ApiException(compact('method', 'path', 'params', 'response_headers', 'response', 'shops_myshopify_domain', 'shops_token'));
+				$info['error'] = true;
+				$info['headers'] = $response_headers;
+				return $info;
+			}
+			else{
+				$response['error'] = false;
+				return (is_array($response) and !empty($response)) ? array_shift($response) : $response;
+			}
 		}
 
 
@@ -102,9 +112,9 @@
 			return (int) $params[$index];
 		}
 
-
+	/*
 	class CurlException extends \Exception { }
-	class Exception extends \Exception
+	class ApiException extends \Exception
 	{
 		protected $info;
 
@@ -116,7 +126,7 @@
 
 		function getInfo() { $this->info; }
 	}
-
+	*/
 
 	function legacy_token_to_oauth_token($shops_token, $shared_secret, $private_app=false)
 	{
