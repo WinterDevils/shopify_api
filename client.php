@@ -42,7 +42,7 @@
 	function client($shop, $shops_token, $api_key, $shared_secret, $private_app=false)
 	{
 		$password = $shops_token;
-		$baseurl = "https://$shop/";
+		$baseurl = $private_app?"https://$api_key:$shared_secret@$shop/":"https://$shop/";
 
 		return function ($method, $path, $params=array(), &$response_headers=array()) use ($baseurl, $shops_token)
 		{
